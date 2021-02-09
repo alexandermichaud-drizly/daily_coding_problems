@@ -1,8 +1,8 @@
 const assert = require('assert')
 
+// O(n!) solution
 const greatestNonadjacentSum = list => {
   
-  console.log('Current value: ' + list[0])
   if (list.length === 0) {
     return 0
   }
@@ -20,9 +20,9 @@ const greatestNonadjacentSum = list => {
   let adjacent = greatestNonadjacentSum(list.slice(1));
   max += list[0];
 
-  console.log('New Max: ', max);
   return adjacent > max ? adjacent : max;
 };
+
 
 const tests = [
   {input: [2,4,6,2,5], result: 13},
