@@ -1,6 +1,7 @@
 const assert = require('assert')
 
 // O(n!) solution
+/*
 const greatestNonadjacentSum = list => {
   
   if (list.length === 0) {
@@ -22,7 +23,21 @@ const greatestNonadjacentSum = list => {
 
   return adjacent > max ? adjacent : max;
 };
+*/
+const greatestNonadjacentSum = list => {
+    let included = 0;
+    let excluded = 0;
+    let new_excluded = 0;
 
+    list.forEach( n => {
+      new_excluded = Math.max(excluded, included);
+
+      included = excluded + n;
+      excluded = new_excluded; 
+    });
+
+    return Math.max(included, excluded);
+};
 
 const tests = [
   {input: [2,4,6,2,5], result: 13},
