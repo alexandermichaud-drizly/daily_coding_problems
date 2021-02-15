@@ -3,24 +3,30 @@ import numpy
 class Board():
 	def __init__(self):
 		self.__squares = numpy.zeros((8,8))
+		self.__search_steps = 0
 
 	def show(self):
 		print(self.__squares)
+	
+	def clear(self):
+		self.__squares = numpy.zeros((8,8))
+		self.__search_steps = 0
 
-	def place_eight_queens(self):
-		self.__eight_queens_helper()
-		print(self.__squares)
+	def place_eight_queens(self, column_start=0):
+		self.__eight_queens_helper(0, column_start)
+		self.show()
+		print(f'Search Steps: {self.__search_steps}')
 
 	def __queen_helper(self, x, y, place=1):
 		self.__squares[x,y] = place
 
 	def __eight_queens_helper(self, row=0, column=0):
+		self.__search_steps += 1
 		valid_placement = False 
 		working_column = column
 
 		while working_column < 8 and not valid_placement:
 			self.__queen_helper(row, working_column)
-			self.show()
 			valid_placement = not self.__collisions_exist(row, working_column)
 			if valid_placement and row == 7:
 				return True
@@ -34,34 +40,38 @@ class Board():
 		return valid_placement
 		
 	def __collisions_exist(self, x, y):
-		print(f'x: {x}; y: {y}')
 		# Check Verticals
 		column = self.__squares[:,y]
-		for i, square in enumerate(column):
-			if square == 1 and i is not x:
-				# print("failed vertical")
+		column = numpy.delete(column, x)
+		for square in column:
+			if square == 1:
 				return True
 
 		# Check Diagonal
 		diag = self.__squares.diagonal(y - x)
-		axis = x if y > x else y
-		for i, square in enumerate(diag):
-			if square == 1 and i is not axis:
-				# print(f'failed diagonal: {i} in {diag}')
+		delete = x if y > x else y
+		diag = numpy.delete(diag, delete)
+		for square in diag:
+			if square == 1:
 				return True
 
 		# Check Antidiagonal
 		flipped_board = numpy.fliplr(self.__squares).copy()
 		squares_reversed = range(7,-1,-1)
-		antidiag = flipped_board.diagonal(squares_reversed[y] - x)
-		axis = max(x,y)
-		for i, square in enumerate(antidiag):
-			if square == 1 and i is not squares_reversed[axis]:
-				# print(f'failed antidiagonal: {i} in {antidiag}')
+		y_reversed = squares_reversed[y]
+		anti_diag = flipped_board.diagonal(y_reversed - x)
+		delete = x if y_reversed > x else y_reversed
+		anti_diag = numpy.delete(anti_diag, delete)
+		for square in anti_diag:
+			if square == 1:
 				return True
 		
 		# No Collisions
 		return False
 
 board = Board()
-board.place_eight_queens()
+
+for i in range(8):
+	board.place_eight_queens(i) 
+	board.clear()
+
