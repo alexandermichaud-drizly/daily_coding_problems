@@ -1,7 +1,7 @@
 def evenly_space(words, k, l):
     i = 0
     while l < k:
-        if i == len(words):
+        if i == len(words) - 1: 
             i = 0
         else:
             words[i] += ' ' 
@@ -19,17 +19,21 @@ def justify(words, k):
 
     while index < len(words):
         word = words[index] 
-        if min_length + len(word) == k:
+        if index == len(words) - 1 or min_length + len(word) == k:
             temp_line.append(word)
             length_without_spaces += len(word)
+            min_length += len(word)
             line_complete = True
             index += 1
+
         elif min_length + len(word) > k:
             line_complete = True
+        
         else:
-            min_length = len(word) if len(temp_line) == 0 else len(word) + 1
-            length_without_spaces = len(word)
+            min_length += len(word) if len(temp_line) == 0 else len(word) + 1
+            length_without_spaces += len(word)
             temp_line.append(word)
+            print(f'Min length: {min_length}; len_w/out_spaces: {length_without_spaces}')
             index += 1
 
         if line_complete:
@@ -48,8 +52,8 @@ test_input = ["the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "d
 
 print(justify(test_input, 16))
 
-# assert justify(test_input, 16) == [\
-#     "the  quick brown",\
-#     "fox  jumps  over",\
-#     "the   lazy   dog"]
+assert justify(test_input, 16) == [\
+    "the  quick brown",\
+    "fox  jumps  over",\
+    "the   lazy   dog"]
     
