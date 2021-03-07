@@ -13,31 +13,6 @@ def running_median(seq):
 
     for i, n in enumerate(seq[3:]):
         print(i,n)
-        if n > upper:
-            if i % 2 == 0:
-                lower = median
-                median = ( upper + lower ) /2.0
-            else:
-                median = upper
-                upper = n
-        elif n < lower:
-            if i % 2 == 0:
-                upper = median
-                median = (upper + lower) / 2.0
-            else:
-                median = lower
-                lower = n
-        else:
-            if i % 2 == 0:
-                if n < median:
-                    lower = n
-                else:
-                    upper = n
-                median = ( upper + lower ) / 2.0
-            else:
-                median = n    
-
-        print(f'Upper: {upper}; Lower: {lower}; Median: {median}')
         output.append(median)
 
     return output
