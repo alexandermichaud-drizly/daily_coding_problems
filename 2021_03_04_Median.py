@@ -1,19 +1,35 @@
 def running_median(seq):
-    if len(seq) == 1:
-        return seq
-    elif len(seq) == 2:
-        return [( seq[0] + seq[1] ) / 2.0]
-    elif len(seq) == 3:
-        return [seq[1]]
-
-    upper = seq[2]
+    upper = seq[0]
     lower = seq[0]
-    median = seq[1]
-    output = [seq[0],( seq[0] + seq[1] ) / 2.0, seq[1]]
+    low_median = seq[0]
+    up_median = seq[0]
 
-    for i, n in enumerate(seq[3:]):
-        print(i,n)
-        output.append(median)
+    for i, n in enumerate(seq):
+        if n > upper:
+            lower = low_median
+            if i % 2 == 0:
+                low_median = upper
+                up_median = upper
+            else:
+                low_median = up_median
+                up_median = upper
+            upper = n
+            
+        elif n > up_median:
+            lower = low_median
+            if i % 2 == 0:
+                low_median = n
+                up_median = n
+            else:
+                low_median = up_median
+                up_median = n
+
+        elif n > low_median:
+            
+        elif n > lower:
+
+
+        output.append((upper + lower) / 2.0)
 
     return output
 
