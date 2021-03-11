@@ -1,25 +1,35 @@
 import pygame
 from pygame.locals import *
 import numpy as np
-import copy
+import copy, time, sys, getopt
 
 DEAD = 0
 ALIVE = 1
-SIZE = 50
+SIZE = 50 
 BOARD_PIXELS = 500
 CELL_SIZE = BOARD_PIXELS / SIZE
 
-# List of coordinates where cells are alive on initialization
-INITIAL_STATE = [
+# Initializers 
+TOAD = [
     (10,10),
     (10,11),
-    (10,12)
+    (10,12),
+    (9, 10),
+    (9, 11),
+    (9, 9)
+]
+
+GLIDER = [
+    (10,10),
+    (10,11),
+    (10,12),
+    (9,12),
+    (8,11)
 ]
 
 class Cell:
     def __init__(self):
         self.state = DEAD
-        self.neighbors = []
 
     def is_alive(self):
         return self.state == ALIVE 
@@ -53,63 +63,74 @@ class View:
         pygame.display.flip()
 
 class GameOfLife:
-    def __init__(self, initial_state=INITIAL_STATE, size=SIZE):
+    def __init__(self, initial_state, size=SIZE):
         self.board = np.ndarray((SIZE,SIZE), dtype=np.object)
         for x, row in enumerate(self.board):
             for y, cell in enumerate(row):
                 self.board[x,y] = Cell()
 
-        for x, row in enumerate(self.board):
-            for y, cell in enumerate(row):
-                neighbors = []
-
-                if x > 0:
-                    neighbors.append(self.board[x - 1, y])
-                if x < SIZE - 1:
-                    neighbors.append(self.board[x + 1, y])
-                if y > 0:
-                    neighbors.append(self.board[x, y - 1])
-                if y < SIZE - 1:
-                    neighbors.append(self.board[x, y + 1])
-                if x > 0 and y > 0:
-                    neighbors.append(self.board[x - 1, y - 1])
-                if x < SIZE - 1 and y > 0:
-                    neighbors.append(self.board[x + 1, y - 1])
-                if x > 0 and y < SIZE - 1:
-                    neighbors.append(self.board[x - 1, y + 1])
-                if x < SIZE - 1 and y < SIZE - 1:
-                    neighbors.append(self.board[x + 1, y + 1])
-
-                self.board[x,y].neighbors = neighbors
-       
-
         for pos in initial_state:
             cell = self.board[pos[0],pos[1]].live()
 
     def tick(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return False
+
         prev_board = copy.deepcopy(self.board)
         for x, row in enumerate(prev_board):
             for y, cell in enumerate(row):
                 live_neighbors = 0
-                for neighbor in cell.neighbors:
-                    if neighbor.is_alive():
-                        live_neighbors += 1
+
+                if x > 0:
+                    live_neighbors += prev_board[x - 1, y].is_alive()
+                if x < SIZE - 1:
+                    live_neighbors += prev_board[x + 1, y].is_alive()
+                if y > 0:
+                    live_neighbors += prev_board[x, y - 1].is_alive()
+                if y < SIZE - 1:
+                    live_neighbors += prev_board[x, y + 1].is_alive()
+                if x > 0 and y > 0:
+                    live_neighbors += prev_board[x - 1, y - 1].is_alive()
+                if x < SIZE - 1 and y > 0:
+                    live_neighbors += prev_board[x + 1, y - 1].is_alive()
+                if x > 0 and y < SIZE - 1:
+                    live_neighbors += prev_board[x - 1, y + 1].is_alive()
+                if x < SIZE - 1 and y < SIZE - 1:
+                    live_neighbors += prev_board[x + 1, y + 1].is_alive()
                 
                 if cell.is_alive(): 
                     if live_neighbors < 2 or live_neighbors > 3:
-                        print(x,y)
                         self.board[x,y].die()
                 elif live_neighbors == 3:
                     self.board[x,y].live()
 
+        return True
+
 if __name__ == "__main__":
-    game = GameOfLife()
+    args = sys.argv[1:]
+    try:
+        opts, args = getopt.getopt(args,"i:",["initialize="])
+    except getopt.GetoptError:
+        print('Invalid arguments')
+        sys.exit(2)
+
+    initial_state = None
+    for opt, arg in opts:
+        if opt in ("-i", "--initialize"):
+            if arg == 'toad':
+                initial_state = TOAD
+            elif arg == 'glider':
+                initial_state = GLIDER
+
+    if initial_state is None:
+        print('No initial pattern provided')
+        sys.exit()
+
+    game = GameOfLife(initial_state)
     view = View(game)
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                running = False
-            else:
-                game.tick()
-                view.draw_board()
+        running = game.tick()
+        view.draw_board()
+        time.sleep(0.1)
