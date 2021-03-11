@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import numpy as np
+import copy
 
 DEAD = 0
 ALIVE = 1
@@ -10,15 +11,15 @@ CELL_SIZE = BOARD_PIXELS / SIZE
 
 # List of coordinates where cells are alive on initialization
 INITIAL_STATE = [
-    (1,1),
-    (1,2),
-    (2,1),
-    (3,1)
+    (10,10),
+    (10,11),
+    (10,12)
 ]
 
 class Cell:
     def __init__(self):
         self.state = DEAD
+        self.neighbors = []
 
     def is_alive(self):
         return self.state == ALIVE 
@@ -58,13 +59,48 @@ class GameOfLife:
             for y, cell in enumerate(row):
                 self.board[x,y] = Cell()
 
+        for x, row in enumerate(self.board):
+            for y, cell in enumerate(row):
+                neighbors = []
+
+                if x > 0:
+                    neighbors.append(self.board[x - 1, y])
+                if x < SIZE - 1:
+                    neighbors.append(self.board[x + 1, y])
+                if y > 0:
+                    neighbors.append(self.board[x, y - 1])
+                if y < SIZE - 1:
+                    neighbors.append(self.board[x, y + 1])
+                if x > 0 and y > 0:
+                    neighbors.append(self.board[x - 1, y - 1])
+                if x < SIZE - 1 and y > 0:
+                    neighbors.append(self.board[x + 1, y - 1])
+                if x > 0 and y < SIZE - 1:
+                    neighbors.append(self.board[x - 1, y + 1])
+                if x < SIZE - 1 and y < SIZE - 1:
+                    neighbors.append(self.board[x + 1, y + 1])
+
+                self.board[x,y].neighbors = neighbors
+       
+
         for pos in initial_state:
-            cell = self.board[pos[0],pos[1]]
-            cell.live()
+            cell = self.board[pos[0],pos[1]].live()
 
     def tick(self):
-        # prev_board = self.
-        return
+        prev_board = copy.deepcopy(self.board)
+        for x, row in enumerate(prev_board):
+            for y, cell in enumerate(row):
+                live_neighbors = 0
+                for neighbor in cell.neighbors:
+                    if neighbor.is_alive():
+                        live_neighbors += 1
+                
+                if cell.is_alive(): 
+                    if live_neighbors < 2 or live_neighbors > 3:
+                        print(x,y)
+                        self.board[x,y].die()
+                elif live_neighbors == 3:
+                    self.board[x,y].live()
 
 if __name__ == "__main__":
     game = GameOfLife()
