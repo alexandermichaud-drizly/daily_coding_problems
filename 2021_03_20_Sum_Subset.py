@@ -1,15 +1,18 @@
 test_arr = [34, -50, 42, 14, -5, 86]
 
 def get_largest_sum(a):
-		max_with = 0
-		max_without = 0
+		max_sum = 0
+		working_sum = 0
 
 		for i in a:
-				temp_sum = max_with + i	
-				max_without = max(max_with, max_without)
-				max_with = temp_sum if temp_sum > max_with else 0
+				temp_sum = working_sum + i
+				if temp_sum > 0:
+						working_sum = temp_sum
+				else:
+						working_sum = 0
+				max_sum = max(max_sum, working_sum)
 
 
-		return max(max_with, max_without)
+		return max_sum
 
 print(get_largest_sum(test_arr))
