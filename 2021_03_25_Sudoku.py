@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 test_puzzle = np.array([\
     [None,None,   1, None,None,None, None,   7,None],\
@@ -18,7 +19,7 @@ class Sudoku:
         self.puzzle = puzzle
 
     def solve(self):
-        self.puzzle = self.recursive_solve(self.puzzle, 0, 0)
+        self.puzzle = self.recursive_solve(self.puzzle.copy(), 0, 0)
 
     def recursive_solve(self, puzzle, row, col):
         if puzzle[row,col] is None:
@@ -28,17 +29,19 @@ class Sudoku:
                     if row == 8 and col == 8:
                         return puzzle
                     elif col == 8:
-                        return self.recursive_solve(puzzle, row + 1, 0)
+                        solution = self.recursive_solve(puzzle.copy(), row + 1, 0)
                     else:
-                        return self.recursive_solve(puzzle, row, col + 1)
+                        solution = self.recursive_solve(puzzle.copy(), row, col + 1)
+                    if solution is not None:
+                        return solution
             return None
         else:
             if row == 8 and col == 8:
                 return puzzle
             elif col == 8:
-                return self.recursive_solve(puzzle, row + 1, 0)
+                return self.recursive_solve(puzzle.copy(), row + 1, 0)
             else:
-                return self.recursive_solve(puzzle, row, col + 1)
+                return self.recursive_solve(puzzle.copy(), row, col + 1)
 
 
     def invalid(self, pos, grid, n):
@@ -59,6 +62,9 @@ class Sudoku:
         
 if __name__ == "__main__":
     sudoku = Sudoku(test_puzzle)
-    sudoku.solve()        
+    start = time.time()
+    sudoku.solve() 
+    end = time.time()
+    duration = end - start
     print(sudoku.puzzle)
-
+    print("Solved in " + str(duration) + " secs")
