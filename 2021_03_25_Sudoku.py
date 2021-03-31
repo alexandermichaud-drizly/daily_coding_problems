@@ -26,6 +26,7 @@ class Sudoku:
             for n in range(1,10):
                 if not self.invalid((row,col), puzzle, n):
                     puzzle[row,col] = n
+                    print(puzzle)
                     if row == 8 and col == 8:
                         return puzzle
                     elif col == 8:
@@ -45,7 +46,7 @@ class Sudoku:
 
 
     def invalid(self, pos, grid, n):
-        row= grid[:,pos[1]]
+        row = grid[:,pos[1]]
         col = grid[pos[0],:]
 
         if n in row or n in col:
